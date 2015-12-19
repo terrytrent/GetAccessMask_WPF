@@ -81,7 +81,7 @@ function New-MessageBox(){
     return $messageBox
 
 }
-# Function for calculating the Access Mask, displaying it, and allowing copy to clipboard
+# Function for calculating the Access Mask
 function Get-AccessMask(){
     # Default Access Mask is the Sync ACL, a part of all default ACLs
     $AccessMask=1048576
@@ -119,12 +119,18 @@ function Get-AccessMask(){
         }
     }
 
-    if($AccessMask -eq "1048576"){
+    $script:AccessMask=$AccessMask
+
+}
+# Function for displaying the Access Mask and allowing copy to clipboard
+function Display-AccessMask(){
+
+    Get-AccessMask
+
+    if($script:AccessMask -eq "1048576"){
         New-MessageBox -message "You have not selected any Security Options.`n`nPlease select Security Options to continue." -title "No Security Options Selected" -icon "Stop" -buttons "OK"
     }
     else{
-        # Set the Access Mask Variable on the Script Scope
-        $script:AccessMask=$AccessMask
 
         # Create the Results Form
         $resultsxaml = [XML](Get-Content “.\Assets\GAMResults.xaml”)
@@ -140,15 +146,16 @@ function Get-AccessMask(){
         $btn_Close=$resultsform.FindName('btn_Close')
 
         # Specify the values and actions of the objects in the xaml file
-        $lbl_AccessMask.Content=$AccessMask
+        $lbl_AccessMask.Content=$script:AccessMask
         $btn_Close.add_click({$resultsform.close()})
-        $btn_CopyToClipboard=(Set-Clipboard -content $AccessMask)
+        $btn_CopyToClipboard=(Set-Clipboard -content $script:AccessMask)
 
         # Specify icon for the Results form (icon variable created in the main form)
         $resultsform.icon=$iconBitmap
 
         # Show the Results form
         [void]$resultsform.ShowDialog()
+
     }
 
 }
@@ -156,8 +163,10 @@ function Get-AccessMask(){
 function Clear-CheckBoxes(){
 
     foreach($p in $permissions){
-
+     
         (Get-Variable -Name $p -ValueOnly).IsChecked=$false
+        (Get-Variable -Name $p -ValueOnly).IsEnabled = $true
+        (Get-Variable -Name $p -ValueOnly).opacity = 1
 
     }
 
@@ -166,9 +175,60 @@ function Clear-CheckBoxes(){
 function Check-AllCheckBoxes(){
 
     foreach($p in $permissions){
-
-        (Get-Variable -Name $p -ValueOnly).IsChecked=$true
+        if($p -ne "cb_FullControl"){
+            (Get-Variable -Name $p -ValueOnly).IsChecked=$true
+        }
     }
+
+}
+# Function Enable or Disable checkboxes if FullControl is checked
+function Disable-OnFullControlCheck(){
+
+    if($cb_FullControl.IsChecked -eq $true){
+
+        foreach($p in $permissions){
+
+            if($p -ne "cb_FullControl"){
+
+                (Get-Variable -Name $p -ValueOnly).IsEnabled = $false
+                (Get-Variable -Name $p -ValueOnly).opacity = 0.5
+            }
+
+        }
+    
+    }
+    else{
+
+        foreach($p in $permissions){
+
+            if($p -ne "cb_FullControl"){
+
+                (Get-Variable -Name $p -ValueOnly).IsEnabled = $true
+                (Get-Variable -Name $p -ValueOnly).opacity = 1
+
+            }
+
+        }
+
+    }
+}
+
+function Check-AccessMask(){
+
+    Get-AccessMask
+    
+    if($script:AccessMask -eq "2032127"){
+    
+        foreach($p in $permissions){
+
+            if($p -ne "cb_FullControl"){
+
+                (Get-Variable -Name $p -ValueOnly).opacity = 0.5
+            }
+
+        }
+        $cb_FullControl.IsChecked=$true
+    }   
 
 }
 
@@ -217,10 +277,21 @@ $btn_ClearAll=$mainform.FindName('btn_ClearAll')
 $btn_CheckAll=$mainform.FindName('btn_CheckAll')
 
 # Define Button Actions
-$btn_GetAccessMask.Add_Click({Get-AccessMask})
+$btn_GetAccessMask.Add_Click({Display-AccessMask})
 $btn_Close.Add_Click({$mainform.close()})
 $btn_CheckAll.Add_Click({Check-AllCheckBoxes})
 $btn_ClearAll.Add_Click({Clear-CheckBoxes})
+
+$cb_FullControl.Add_Click({Disable-OnFullControlCheck})
+
+foreach($p in $permissions){
+    
+    if($p -ne "cb_FullControl"){
+
+        (Get-Variable $p -ValueOnly).Add_Click({Check-AccessMask})
+
+    }
+}
 
 # Show the form
 [void]$mainform.ShowDialog()
