@@ -20,8 +20,10 @@
                 <CheckBox Name="cb_TakeOwnership" Content="Take ownership" Margin="205,125.76,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
             </Grid>
         </Border>
-        <Button Name="btn_GetAccessMask" Content="Get Access Mask" HorizontalAlignment="Right" Margin="0,0,20,46.96" VerticalAlignment="Bottom" Background="#FFDDDDDD" BorderBrush="#FF707070" Width="125"/>
-        <Button Name="btn_Close" Content="Close" HorizontalAlignment="Right" Margin="0,0,20,20" VerticalAlignment="Bottom" Background="#FFDDDDDD" BorderBrush="#FF707070" Width="100"/>
+        <Button Name="btn_GetAccessMask" Content="Get Access Mask" HorizontalAlignment="Right" Margin="0,0,20,20" VerticalAlignment="Bottom" Background="#FFDDDDDD" BorderBrush="#FF707070" Width="100"/>
+        <Button Name="btn_Close" Content="Close" HorizontalAlignment="Left" Margin="20,0,0,20" VerticalAlignment="Bottom" Background="#FFDDDDDD" BorderBrush="#FF707070" Width="100"/>
+        <Button Name="btn_CheckAll" Content="Check All" HorizontalAlignment="Right" Margin="0,20,20,0" VerticalAlignment="Top" Background="#FFDDDDDD" BorderBrush="#FF707070" Width="100"/>
+        <Button Name="btn_ClearAll" Content="Clear All" HorizontalAlignment="Right" Margin="0,50,20,0" VerticalAlignment="Top" Background="#FFDDDDDD" BorderBrush="#FF707070" Width="100"/>
 
     </Grid>
 </Window>

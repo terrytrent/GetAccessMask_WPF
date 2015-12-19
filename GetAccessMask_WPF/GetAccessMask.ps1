@@ -152,6 +152,26 @@ function Get-AccessMask(){
     }
 
 }
+# Function to clear all checkboxes
+function Clear-CheckBoxes(){
+
+    foreach($p in $permissions){
+
+        (Get-Variable -Name $p -ValueOnly).IsChecked=$false
+
+    }
+
+}
+# Function to check all but "Full Control"
+function Check-AllCheckBoxes(){
+
+    foreach($p in $permissions){
+
+        (Get-Variable -Name $p -ValueOnly).IsChecked=$true
+    }
+
+}
+
 
 # Create the Main Form
 $xaml = [XML](Get-Content “.\Assets\GAMMain.xaml”)
@@ -193,10 +213,14 @@ $cb_ChangePermissions=$mainform.FindName('cb_ChangePermissions')
 $cb_TakeOwnership=$mainform.FindName('cb_TakeOwnership')
 $btn_GetAccessMask=$mainform.FindName('btn_GetAccessMask')
 $btn_Close=$mainform.FindName('btn_Close')
+$btn_ClearAll=$mainform.FindName('btn_ClearAll')
+$btn_CheckAll=$mainform.FindName('btn_CheckAll')
 
 # Define Button Actions
 $btn_GetAccessMask.Add_Click({Get-AccessMask})
 $btn_Close.Add_Click({$mainform.close()})
+$btn_CheckAll.Add_Click({Check-AllCheckBoxes})
+$btn_ClearAll.Add_Click({Clear-CheckBoxes})
 
 # Show the form
 [void]$mainform.ShowDialog()
